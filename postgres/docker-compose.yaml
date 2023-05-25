@@ -1,0 +1,79 @@
+version: '3'
+
+services:
+  #######################################################################
+  ### services :: postgres
+  #######################################################################
+  postgres:
+    image: postgres:15.2
+    privileged: true
+    restart: always
+    env_file:
+    - $PWD/.secret/__envrc.d/credential.postgres.envrc
+    - $PWD/config/__envrc.d/postgres.envrc
+    networks:
+    - _network-bridge-local
+    ports:
+    - 5432:5432
+    healthcheck:
+      test: curl -f http://127.0.0.1:5432
+      retries: 6
+      interval: 15s
+      timeout: 10s
+      start_period: 30s
+    volumes:
+    - _volume__postgres:/var/lib/postgresql/data
+    - $PWD/config/postgres/.default/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '1m'
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1.0'
+          #memory: 4G
+
+  #######################################################################
+  ### services :: postgres_pgadmin4
+  #######################################################################
+  postgres_pgadmin4:
+    image: dpage/pgadmin4:6.21
+    privileged: true
+    restart: always
+    env_file:
+    - $PWD/.secret/__envrc.d/credential.postgres_pgadmin4.envrc
+    - $PWD/config/__envrc.d/postgres_pgadmin4.envrc
+    depends_on:
+    - postgres
+    networks:
+    - _network-bridge-local
+    ports:
+    - 55432:8080
+    healthcheck:
+      test: curl -f http://127.0.0.1:8080
+      retries: 6
+      interval: 15s
+      timeout: 10s
+      start_period: 30s
+    volumes:
+    - _volume__postgres_pgadmin4:/var/lib/pgadmin
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '1m'
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1.0'
+          #memory: 1G
+
+networks:
+  _network-bridge-local:
+    driver: bridge
+
+volumes:
+  _volume__postgres: {}
+  _volume__postgres_pgadmin4: {}

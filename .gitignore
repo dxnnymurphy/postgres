@@ -1,0 +1,20 @@
+### Credential
+**/credential
+**/.secret
+### Artifacts
+**/.dist
+### Build
+**/build
+### Data
+**/*.swagger.json
+### Language-specific: Golang
+**/go.sum
+**/vendor
+**/*.pb.go
+**/*.pb.gw.go
+### Language-specific: Java
+**/target
+### Language-specific: Python
+**/*.egg-info
+**/*_pb2.py
+**/*_pb2_grpc.py
